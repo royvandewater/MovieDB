@@ -68,11 +68,19 @@ namespace MovieApp.Controllers
         // POST: /Home/Edit/5
 
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(int id, Movie updatedMovie)
         {
             try
             {
-                // TODO: Add update logic here
+                var originalMovie = (from m in _db.Movies
+                                     where m.Id == updatedMovie.Id
+                                     select m).First();
+
+                if(!ModelState.IsValid)
+                    return View(originalMovie);
+
+                _db.ApplyCurrentValues(originalMovie.EntityKey.EntitySetName, updatedMovie);
+                _db.SaveChanges();
  
                 return RedirectToAction("Index");
             }
